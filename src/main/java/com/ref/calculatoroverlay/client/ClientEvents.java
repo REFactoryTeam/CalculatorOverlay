@@ -1,8 +1,11 @@
 package com.ref.calculatoroverlay.client;
 
+import appeng.integration.modules.jei.JEIPlugin;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.ref.calculatoroverlay.CalculatorOverlay;
+import dev.emi.emi.api.EmiApi;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.EditBox;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -170,6 +173,11 @@ public class ClientEvents {
    */
   private static void tryToggleCalculator(ScreenEvent.KeyPressed.Pre event) {
     if (KeyBindings.toggleCalculator == null || Minecraft.getInstance().level == null) return;
+    // Suppress toggle when an EditBox (text field) has focus to avoid hijacking typed characters
+    if (CalculatorOverlay.JEILoad
+        && JEIPlugin.instance().getIngredientListOverlay().hasKeyboardFocus()) return;
+    if (CalculatorOverlay.EMILoad && EmiApi.isSearchFocused()) return;
+    if (event.getScreen().getFocused() instanceof EditBox) return;
     InputConstants.Key key = InputConstants.getKey(event.getKeyCode(), event.getScanCode());
     if (KeyBindings.toggleCalculator.isActiveAndMatches(key)) {
       calculator.toggle();
