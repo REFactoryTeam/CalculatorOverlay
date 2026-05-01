@@ -1,8 +1,8 @@
 package com.ref.calculatoroverlay.client;
 
-import appeng.integration.modules.jei.JEIPlugin;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.ref.calculatoroverlay.CalculatorOverlay;
+import com.ref.calculatoroverlay.JEIPlugin;
 import dev.emi.emi.api.EmiApi;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.EditBox;
@@ -175,7 +175,7 @@ public class ClientEvents {
     if (KeyBindings.toggleCalculator == null || Minecraft.getInstance().level == null) return;
     // Suppress toggle when an EditBox (text field) has focus to avoid hijacking typed characters
     if (CalculatorOverlay.JEILoad
-        && JEIPlugin.instance().getIngredientListOverlay().hasKeyboardFocus()) return;
+        && JEIPlugin.jeiRuntime.getIngredientListOverlay().hasKeyboardFocus()) return;
     if (CalculatorOverlay.EMILoad && EmiApi.isSearchFocused()) return;
     if (event.getScreen().getFocused() instanceof EditBox) return;
     InputConstants.Key key = InputConstants.getKey(event.getKeyCode(), event.getScanCode());
