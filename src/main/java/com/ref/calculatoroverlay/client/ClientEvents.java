@@ -20,6 +20,8 @@ public class ClientEvents {
 
   private static final CalculatorWidget calculator = new CalculatorWidget();
 
+  private static char suppressedNextTypedChar = '\0';
+
   /**
    * Renders the calculator overlay on top of every active GUI screen.
    *
@@ -134,6 +136,9 @@ public class ClientEvents {
     if (calculator.isVisible()) {
       char typedChar = mapKeyToChar(event.getKeyCode(), event.getModifiers());
       if (calculator.keyPressed(event.getKeyCode(), typedChar, event.getModifiers())) {
+        if (isNumpadPrintableKey(event.getKeyCode())) {
+          suppressedNextTypedChar = typedChar;
+        }
         event.setCanceled(true);
         return;
       }
@@ -154,6 +159,13 @@ public class ClientEvents {
     if (!calculator.isVisible()) return;
 
     char c = event.getCodePoint();
+    if (suppressedNextTypedChar == c) {
+      suppressedNextTypedChar = '\0';
+      event.setCanceled(true);
+      return;
+    }
+    suppressedNextTypedChar = '\0';
+
     if (calculator.keyPressed(-1, c, 0)) {
       event.setCanceled(true);
     }
@@ -203,13 +215,24 @@ public class ClientEvents {
     }
     // Numpad operators
     return switch (keyCode) {
-      case 332 -> '-'; // GLFW_KEY_KP_SUBTRACT
+      case 333 -> '-'; // GLFW_KEY_KP_SUBTRACT
       case 334 -> '+'; // GLFW_KEY_KP_ADD
       case 335 -> '='; // GLFW_KEY_KP_ENTER
-      case 333 -> '*'; // GLFW_KEY_KP_MULTIPLY
+      case 332 -> '*'; // GLFW_KEY_KP_MULTIPLY
       case 331 -> '/'; // GLFW_KEY_KP_DIVIDE
       case 330 -> '.'; // GLFW_KEY_KP_DECIMAL
       default -> '\0';
     };
+  }
+
+  /**
+   * Returns true for numpad keys that are inserted from {@link ScreenEvent.KeyPressed.Pre} and can
+   * also arrive again through {@link ScreenEvent.CharacterTyped.Pre}.
+   *
+   * @param keyCode the GLFW key code to test
+   * @return true when the key is a printable numpad key
+   */
+  private static boolean isNumpadPrintableKey(int keyCode) {
+    return keyCode >= 320 && keyCode <= 334;
   }
 }

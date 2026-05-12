@@ -700,7 +700,7 @@ public class CalculatorWidget {
     }
     // Numpad operators
     switch (keyCode) {
-      case 332 -> {
+      case 333 -> {
         insertText("-");
         return true;
       } // GLFW_KEY_KP_SUBTRACT
@@ -708,7 +708,7 @@ public class CalculatorWidget {
         insertText("+");
         return true;
       } // GLFW_KEY_KP_ADD
-      case 333 -> {
+      case 332 -> {
         insertText("*");
         return true;
       } // GLFW_KEY_KP_MULTIPLY
